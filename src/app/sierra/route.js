@@ -13,9 +13,11 @@ export async function POST(request) {
       {
         method: "POST",
         headers: {
-          Authorization: "Basic UTZYVmI0THdRSXdGOGppZ1JUUC9hbUlGYnBTTTpvcGl1ZXdxcmtsamhzYWR2bGtqc2Rmb2l1ZXdybjkzMjcrMjEz=",
+          Authorization: `Basic ${process.env.SIERRA_API_KEY}`,
           Accept: "application/json",
+          "Content-Type": "application/x-www-form-urlencoded",
         },
+        body: "grant_type=client_credentials"
       }
     );
 
@@ -28,7 +30,7 @@ export async function POST(request) {
 
     let allPatrons = [];
     let offset = 0;
-    const limit = 500;
+    const limit = 1000000;
     let keepFetching = true;
     let allPatronIds = [];
     
@@ -49,7 +51,7 @@ export async function POST(request) {
             },
             expr: {
               op: "equals",
-              operands: [String(pType)]
+              operands: [String(pType), ""]
             }
           })
         }
@@ -78,20 +80,8 @@ export async function POST(request) {
 
     console.log(`Found ${allPatronIds.length} patrons with pType ${pType}`);
 
-    // Since fetching potentially thousands of patrons details could take a very long time
-    // and cause a serverless timeout (like Vercel 10s limit), we'll limit the number 
-    // of returned details to something reasonable for a single request, or the frontend
-    // should implement polling/batching. 
-    // For this implementation we will return up to 500 records at a time if the user asks,
-    // but the requirements say "get a list of all cardholders with that p-type".
-    // We'll attempt to fetch them all but log progress. Vercel max limit is 60s for pro, 10s hobby.
-    // Let's try to fetch in larger batches.
-
     const batchSize = 50; 
-    
-    // Safety limit to prevent timeouts in development, limit to first 1000 for now or fetch all.
-    // Since this might timeout in a standard vercel route if over 10s, we will do our best.
-    const idsToFetch = allPatronIds; // We'll try to fetch all 
+    const idsToFetch = allPatronIds; 
 
     for (let i = 0; i < idsToFetch.length; i += batchSize) {
       const batchIds = idsToFetch.slice(i, i + batchSize);
