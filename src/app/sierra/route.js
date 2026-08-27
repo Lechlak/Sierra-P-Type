@@ -13,7 +13,7 @@ export async function POST(request) {
       {
         method: "POST",
         headers: {
-          Authorization: `Basic ${process.env.SIERRA_API_KEY}`,
+          Authorization: "Basic UTZYVmI0THdRSXdGOGppZ1JUUC9hbUlGYnBTTTpvcGl1ZXdxcmtsamhzYWR2bGtqc2Rmb2l1ZXdybjkzMjcrMjEz=",
           Accept: "application/json",
         },
       }
