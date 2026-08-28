@@ -3,6 +3,67 @@ import React, { useState } from "react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
+const patronTypes = [
+  { value: "0", label: "Adult Video" },
+  { value: "1", label: "Juvenile Video" },
+  { value: "2", label: "" }, // Based on the screenshot it's blank but ID exists. Using 2 to keep consistent, but label is blank in screenshot
+  { value: "3", label: "Adult" },
+  { value: "4", label: "Juvenile" },
+  { value: "6", label: "Non Resident Video" },
+  { value: "7", label: "Non Resident Juvenile Video" },
+  { value: "9", label: "Non Resident" },
+  { value: "10", label: "Non Resident Juvenile" },
+  { value: "12", label: "Visitor" },
+  { value: "13", label: "Staff" },
+  { value: "14", label: "Retiree" },
+  { value: "16", label: "Organization" },
+  { value: "17", label: "Temporary Address-Adult" },
+  { value: "18", label: "Temporary Address - Juvenile" },
+  { value: "19", label: "Bookmobile Adult Video" },
+  { value: "20", label: "Bookmobile Juvenile Video" },
+  { value: "21", label: "Bookmobile Adult" },
+  { value: "22", label: "Bookmobile Juvenile" },
+  { value: "23", label: "Childcare" },
+  { value: "24", label: "Mobile Facility" },
+  { value: "25", label: "Home Delivery" },
+  { value: "27", label: "Internet Use only Adult" },
+  { value: "28", label: "Internet Use Only Juvenile" },
+  { value: "29", label: "School Internet Access only" },
+  { value: "31", label: "eMedia" },
+  { value: "33", label: "Ohio Interlibrary Loan" },
+  { value: "34", label: "Non Ohio Interlibrary Loan" },
+  { value: "37", label: "Mobile Organization" },
+  { value: "44", label: "Lost Stolen" },
+  { value: "45", label: "Access Card" },
+  { value: "60", label: "Test" },
+  { value: "199", label: "Training patron" },
+  { value: "200", label: "OhioLINK Undergrad" },
+  { value: "201", label: "OhioLINK Graduate" },
+  { value: "202", label: "OhioLINK Faculty" },
+  { value: "203", label: "OhioLINK Staff" },
+  { value: "204", label: "OhioLINK Courtesy/Permit" },
+  { value: "205", label: "OhioLINK Affiliated Fac/Staff" },
+  { value: "206", label: "OhioLINK Locally Restricted" },
+  { value: "210", label: "OhioLINK test patron" },
+  { value: "211", label: "CNY CRL Undergraduate" },
+  { value: "212", label: "Ohiolink Public Adult" },
+  { value: "213", label: "Ohiolink Public Juvenile" },
+  { value: "214", label: "Ohiolink Public Teen" },
+  { value: "215", label: "Ohiolink Public Senior" },
+  { value: "216", label: "Ohiolink High School Student" },
+  { value: "217", label: "Ohiolink High School Staff" },
+  { value: "220", label: "OhioLINK Undergraduate" },
+  { value: "221", label: "OhioLINK Graduate" },
+  { value: "222", label: "OhioLINK Faculty" },
+  { value: "223", label: "OhioLINK Staff" },
+  { value: "230", label: "OHPIR Testing Patron" },
+  { value: "231", label: "OHPIR General" },
+  { value: "232", label: "OHPIR Limited" },
+  { value: "233", label: "OHPIR Visiting" },
+  { value: "234", label: "OHPIR ineligible" },
+  { value: "235", label: "OHPIR No Media" }
+].filter(p => p.label !== "").sort((a, b) => a.label.localeCompare(b.label));
+
 function MainComponent() {
   const [pType, setPType] = useState("");
   const [loading, setLoading] = useState(false);
@@ -91,14 +152,19 @@ function MainComponent() {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Patron Type (P-Type)
               </label>
-              <input
-                type="number"
+              <select
                 value={pType}
                 onChange={(e) => setPType(e.target.value)}
-                placeholder="Enter P-Type (e.g. 1)"
-                className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                onKeyPress={(e) => e.key === "Enter" && handleFetch()}
-              />
+                className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white"
+                onKeyDown={(e) => e.key === "Enter" && handleFetch()}
+              >
+                <option value="" disabled>Select a Patron Type</option>
+                {patronTypes.map((pt) => (
+                  <option key={pt.value} value={pt.value}>
+                    {pt.label} ({pt.value})
+                  </option>
+                ))}
+              </select>
             </div>
             <button
               onClick={handleFetch}
