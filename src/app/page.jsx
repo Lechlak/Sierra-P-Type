@@ -36,8 +36,9 @@ function MainComponent() {
       }
 
       const data = await response.json();
-      setPatrons(data);
-      setProgress(`Found ${data.length} patron(s).`);
+      const fetchedPatrons = data.patrons || [];
+      setPatrons(fetchedPatrons);
+      setProgress(`Found ${data.count !== undefined ? data.count : fetchedPatrons.length} patron(s).`);
     } catch (err) {
       console.error(err);
       setError(err.message || "An unexpected error occurred");
