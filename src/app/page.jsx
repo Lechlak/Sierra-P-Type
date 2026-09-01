@@ -3,8 +3,8 @@ import React, { useState } from "react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
-const patronTypes = [
-  { value: "0", label: "Adult Video" },
+/*
+{ value: "0", label: "Adult Video" },
   { value: "1", label: "Juvenile Video" },
   { value: "2", label: "" }, // Based on the screenshot it's blank but ID exists. Using 2 to keep consistent, but label is blank in screenshot
   { value: "3", label: "Adult" },
@@ -62,6 +62,14 @@ const patronTypes = [
   { value: "233", label: "OHPIR Visiting" },
   { value: "234", label: "OHPIR ineligible" },
   { value: "235", label: "OHPIR No Media" }
+   */
+
+const patronTypes = [
+  { value: "16", label: "Organization" },
+  { value: "23", label: "Childcare" },
+  { value: "24", label: "Mobile Facility" },
+  { value: "25", label: "Home Delivery" },
+  { value: "37", label: "Mobile Organization" }
 ].filter(p => p.label !== "").sort((a, b) => a.label.localeCompare(b.label));
 
 function MainComponent() {
