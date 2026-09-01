@@ -67,7 +67,6 @@ import { saveAs } from "file-saver";
 const patronTypes = [
   { value: "16", label: "Organization" },
   { value: "23", label: "Childcare" },
-  { value: "24", label: "Mobile Facility" },
   { value: "25", label: "Home Delivery" },
   { value: "37", label: "Mobile Organization" }
 ].filter(p => p.label !== "").sort((a, b) => a.label.localeCompare(b.label));
