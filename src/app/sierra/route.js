@@ -1,10 +1,13 @@
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { pType } = body;
+    const { pType, queryType } = body;
 
-    // Validate required Patron Type
-    if (pType === undefined || pType === null || pType === "") {
+    const isBannedSuspendedQuery =
+      queryType === "banned_suspended" || pType === "banned_suspended";
+
+    // Validate required Patron Type if not a banned/suspended query
+    if (!isBannedSuspendedQuery && (pType === undefined || pType === null || pType === "")) {
       return Response.json(
         { error: "Patron Type (pType) is required" },
         { status: 400 }
@@ -93,7 +96,55 @@ export async function POST(request) {
     const queryLimit = 1000;
     let keepFetching = true;
 
-    // Fetch all patron IDs matching pType
+    // Construct query payload based on query type
+    const sierraQueryPayload = isBannedSuspendedQuery
+      ? {
+          queries: [
+            {
+              target: {
+                record: {
+                  type: "patron",
+                },
+                field: {
+                  tag: "m",
+                },
+              },
+              expr: {
+                op: "has",
+                operands: ["suspended", ""],
+              },
+            },
+            "or",
+            {
+              target: {
+                record: {
+                  type: "patron",
+                },
+                field: {
+                  tag: "m",
+                },
+              },
+              expr: {
+                op: "has",
+                operands: ["banned", ""],
+              },
+            },
+          ],
+        }
+      : {
+          target: {
+            record: {
+              type: "patron",
+            },
+            id: 47,
+          },
+          expr: {
+            op: "equals",
+            operands: [String(pType), ""],
+          },
+        };
+
+    // Fetch all patron IDs matching query
     while (keepFetching) {
       const queryUrl = new URL(
         "https://catalog.toledolibrary.org/iii/sierra-api/v6/patrons/query"
@@ -109,18 +160,7 @@ export async function POST(request) {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          target: {
-            record: {
-              type: "patron",
-            },
-            id: 47,
-          },
-          expr: {
-            op: "equals",
-            operands: [String(pType), ""],
-          },
-        }),
+        body: JSON.stringify(sierraQueryPayload),
         cache: "no-store",
       });
 
@@ -133,6 +173,7 @@ export async function POST(request) {
           body: errorText,
           offset,
           pType,
+          queryType,
         });
 
         throw new Error(
@@ -175,7 +216,9 @@ export async function POST(request) {
     }
 
     console.log(
-      `Found ${allPatronIds.length} patrons with pType ${pType}`
+      `Found ${allPatronIds.length} patrons for ${
+        isBannedSuspendedQuery ? "banned/suspended query" : `pType ${pType}`
+      }`
     );
 
     // Fetch full patron details in batches
